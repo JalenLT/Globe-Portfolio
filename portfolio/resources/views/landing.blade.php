@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Portfolio | Stefan Seunarine</title>
+    <title>{{ env("APP_NAME") }}</title>
 </head>
 <body>
 <script type="text/javascript">
@@ -64,9 +64,9 @@
         var intersectionPoint = new THREE.Vector3();
         raycaster.ray.intersectPlane(new THREE.Plane(planeNormal, 0), intersectionPoint);
 
-        var targetRotation = Math.atan2(intersectionPoint.y - cone.position.y, intersectionPoint.x - cone.position.x);
+        var targetRotation = Math.atan2(intersectionPoint.y - vehicle.position.y, intersectionPoint.x - vehicle.position.x);
 
-        cone.rotation.z = targetRotation - Math.PI / 2;
+        vehicle.rotation.z = targetRotation - Math.PI / 2;
     });
     window.addEventListener('mousedown', (event) => {
         isHeld = true;
@@ -77,6 +77,43 @@
     window.addEventListener('mouseup', (event) => {
         isHeld = false;
     })
+
+    /**************************
+     *** AUTOMATIC ROTATION ***
+     **************************/
+     let experienceRotation = new THREE.Quaternion();
+    let educationRotation = new THREE.Quaternion();
+    let aboutMeRotation = new THREE.Quaternion();
+    let projectsRotation = new THREE.Quaternion();
+    let cameraPannedPosition = camera.position.clone();
+    let vehiclePannedPosition = undefined;
+    let presetRotation = undefined;
+    experienceRotation.setFromEuler(new THREE.Euler(-0.31619639837023544, -0.8185814073168974, -0.6237763716766752, 'XYZ'));
+    educationRotation.setFromEuler(new THREE.Euler(0.692056402693423, 0.10864975004848018, 1.1022957314945494, 'XYZ'));
+    aboutMeRotation.setFromEuler(new THREE.Euler(1.8664010295415794, -0.5840994459000574, -1.265145192577232, 'XYZ'));
+    projectsRotation.setFromEuler(new THREE.Euler(-1.9460707410016864, -0.33008632927243065, -1.169701473000568, 'XYZ'));
+    cameraPannedPosition.x += 2;
+    cameraPannedPosition.z -= 0.2;
+    var movementSmoothness = 0.05;
+    var rotationDuration = 2000;
+    var rotationStartTime = null;
+    let isRotating = false;
+    let isViewing = false;
+    let isPanned = false;
+    function updateRotation(obj, presetRotation) {
+        if(obj){
+            var currentTime = Date.now();
+            var deltaTime = currentTime - rotationStartTime;
+
+            if (deltaTime < rotationDuration) {
+                isRotating = true;
+                var t = deltaTime / rotationDuration;
+                obj.quaternion.slerp(presetRotation, t);
+            }else{
+                isRotating = false;
+            }
+        }
+    }
 
     /*******************
      *** LOAD MODELS ***
@@ -90,7 +127,7 @@
     var aboutMePlane = undefined;
     var projects = undefined;
     var projectsPlane = undefined;
-    var name = undefined;
+    var vehicle = undefined;
     loader.load("{{ asset("models/earth.glb") }}", function ( gltf ) {
         earth = gltf.scene;
         scene.add(earth);
@@ -116,7 +153,6 @@
             if (child.isMesh) {
                 child.material = customMaterial;
                 child.material.opacity = 0;
-                console.log(child.material.opacity);
             }
         });
         }
@@ -142,7 +178,6 @@
             if (child.isMesh) {
                 child.material = customMaterial;
                 child.material.opacity = 0;
-                console.log(child.material.opacity);
             }
         });
         }
@@ -168,7 +203,6 @@
             if (child.isMesh) {
                 child.material = customMaterial;
                 child.material.opacity = 0;
-                console.log(child.material.opacity);
             }
         });
         }
@@ -194,58 +228,23 @@
             if (child.isMesh) {
                 child.material = customMaterial;
                 child.material.opacity = 0;
-                console.log(child.material.opacity);
             }
         });
         }
         }, undefined, function ( error ) {
         console.error( error );
     });
-    loader.load("{{ asset("models/name.glb") }}", function ( gltf ) {
-        name = gltf.scene;
-        scene.add(name);
-        name.position.set(0, 1.3, -1);
+    loader.load("{{ asset("models/vehicle.glb") }}", function ( gltf ) {
+        vehicle = gltf.scene;
+        scene.add(vehicle);
+        vehicle.position.set(0, 0, 1.3);
+        vehicle.scale.set(0.08, 0.08, 0.08);
+        vehicle.rotation.z = Math.PI / 2;
+        vehiclePannedPosition = vehicle.position.clone();
+        vehiclePannedPosition.z += 4;
         }, undefined, function ( error ) {
         console.error( error );
     });
-
-    const coneGeometry = new THREE.ConeGeometry( 0.5 / 8, 1 / 6, 9 );
-    const coneMaterial = new THREE.MeshBasicMaterial( {color: 0x66ccff} );
-    const cone = new THREE.Mesh(coneGeometry, coneMaterial ); scene.add( cone );
-    scene.add(cone);
-    cone.rotation.z = Math.PI / 2;
-    cone.position.z += 2;
-
-    /**************************
-     *** AUTOMATIC ROTATION ***
-     **************************/
-    let experienceRotation = new THREE.Quaternion();
-    let educationRotation = new THREE.Quaternion();
-    let aboutMeRotation = new THREE.Quaternion();
-    let projectsRotation = new THREE.Quaternion();
-    let presetRotation = undefined;
-    experienceRotation.setFromEuler(new THREE.Euler(-0.31619639837023544, -0.8185814073168974, -0.6237763716766752, 'XYZ'));
-    educationRotation.setFromEuler(new THREE.Euler(0.692056402693423, 0.10864975004848018, 1.1022957314945494, 'XYZ'));
-    aboutMeRotation.setFromEuler(new THREE.Euler(1.8664010295415794, -0.5840994459000574, -1.265145192577232, 'XYZ'));
-    projectsRotation.setFromEuler(new THREE.Euler(-1.9460707410016864, -0.33008632927243065, -1.169701473000568, 'XYZ'));
-    var rotationDuration = 2000;
-    var rotationStartTime = null;
-    let isRotating = false;
-    function updateRotation(obj, presetRotation) {
-        if(obj){
-            var currentTime = Date.now();
-            var deltaTime = currentTime - rotationStartTime;
-
-            if (deltaTime < rotationDuration) {
-                isRotating = true;
-                var t = deltaTime / rotationDuration;
-                obj.quaternion.slerp(presetRotation, t);
-            }else{
-                isRotating = false;
-            }
-        }
-
-    }
 
     /**********************
      *** SCENE LIGHTING ***
@@ -272,7 +271,6 @@
      *** RAYCAST ***
      ***************/
     const raycaster = new THREE.Raycaster();
-
     // Add an event listener to track mouse movement
     document.addEventListener('mousemove', (event) => {
         // Calculate mouse position in normalized device coordinates (-1 to 1)
@@ -283,7 +281,7 @@
         raycaster.setFromCamera(mouse, camera);
 
         // Calculate the intersection point with the z = 0 plane
-        if(educationPlane){
+        if(educationPlane && !isViewing){
             let educationIntersection = raycaster.intersectObject(educationPlane);
             if (educationIntersection.length > 0) {
                 // Get the intersection point
@@ -292,7 +290,7 @@
                 educationPlane.scale.set(1, 1, 1);
             }
         }
-        if(experiencePlane){
+        if(experiencePlane && !isViewing){
             let experienceIntersection = raycaster.intersectObject(experiencePlane);
             if (experienceIntersection.length > 0) {
                 // Get the intersection point
@@ -301,7 +299,7 @@
                 experiencePlane.scale.set(1, 1, 1);
             }
         }
-        if(aboutMePlane){
+        if(aboutMePlane && !isViewing){
             let aboutMeIntersection = raycaster.intersectObject(aboutMePlane);
             if (aboutMeIntersection.length > 0) {
                 // Get the intersection point
@@ -310,7 +308,7 @@
                 aboutMePlane.scale.set(1, 1, 1);
             }
         }
-        if(projectsPlane){
+        if(projectsPlane && !isViewing){
             let projectsIntersection = raycaster.intersectObject(projectsPlane);
             if (projectsIntersection.length > 0) {
                 // Get the intersection point
@@ -322,6 +320,7 @@
     });
     // Add an event listener to track mouse movement
     document.addEventListener('mousedown', (event) => {
+        let isClicked = false;
         // Update the raycaster
         raycaster.setFromCamera(mouse, camera);
 
@@ -329,34 +328,57 @@
         if(educationPlane){
             let educationIntersection = raycaster.intersectObject(educationPlane);
             if (educationIntersection.length > 0) {
+                isClicked = true;
                 isRotating = true;
                 rotationStartTime = Date.now();
                 presetRotation = educationRotation;
+                educationPlane.scale.set(1, 1, 1);
             }
         }
         if(experiencePlane){
             let experienceIntersection = raycaster.intersectObject(experiencePlane);
             if (experienceIntersection.length > 0) {
+                isClicked = true;
                 isRotating = true;
                 rotationStartTime = Date.now();
                 presetRotation = experienceRotation;
+                experiencePlane.scale.set(1, 1, 1);
             }
         }
         if(aboutMePlane){
             let aboutMeIntersection = raycaster.intersectObject(aboutMePlane);
             if (aboutMeIntersection.length > 0) {
+                isClicked = true;
                 isRotating = true;
                 rotationStartTime = Date.now();
                 presetRotation = aboutMeRotation;
+                aboutMePlane.scale.set(1, 1, 1);
             }
         }
         if(projectsPlane){
             let projectsIntersection = raycaster.intersectObject(projectsPlane);
             if (projectsIntersection.length > 0) {
+                isClicked = true;
                 isRotating = true;
                 rotationStartTime = Date.now();
                 presetRotation = projectsRotation;
+                projectsPlane.scale.set(1, 1, 1);
             }
+        }
+        if(isClicked){
+            isRotating = true;
+            isViewing = true;
+            rotationStartTime = Date.now();
+            cameraPannedPosition = new THREE.Vector3(2, 0, 3.3);
+            vehiclePannedPosition = new THREE.Vector3(0, 0, 5.3);
+        }else{
+            if(isViewing){
+                isRotating = true;
+            }
+            isViewing = false;
+            rotationStartTime = Date.now();
+            cameraPannedPosition = new THREE.Vector3(0, 0, 3.5);
+            vehiclePannedPosition = new THREE.Vector3(0, 0, 1.3);
         }
     });
 
@@ -370,10 +392,15 @@
         (projectsPlane && earth && !projectsPlane.parent.name) ? earth.add(projectsPlane) : null;
         (projects && projectsPlane && !projects.parent.name) ? projectsPlane.add(projects) : null;
 
-        (isRotating) ? updateRotation(earth, presetRotation) : null;
+        if(isRotating){
+            updateRotation(earth, presetRotation);
+            camera.position.lerp(cameraPannedPosition, movementSmoothness);
+            vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
+
+        }
         requestAnimationFrame( animate );
 
-        if(isHeld && heldMouse && (heldMouse.x != 0 && heldMouse.y != 0)){
+        if(isHeld && heldMouse && (heldMouse.x != 0 && heldMouse.y != 0) && !isViewing){
             earth.rotateOnWorldAxis(xAxis, degToRad(heldMouse.y * rotateSpeed));
             earth.rotateOnWorldAxis(yAxis, degToRad(-heldMouse.x * rotateSpeed));
         }
