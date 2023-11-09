@@ -11,6 +11,9 @@
     function degToRad(degrees){
         return degrees * (Math.PI / 180)
     }
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
 </script>
 <script type="importmap">
     {
@@ -128,6 +131,7 @@
     var projects = undefined;
     var projectsPlane = undefined;
     var vehicle = undefined;
+    var moon = undefined;
     loader.load("{{ asset("models/earth.glb") }}", function ( gltf ) {
         earth = gltf.scene;
         scene.add(earth);
@@ -242,6 +246,13 @@
         vehicle.rotation.z = Math.PI / 2;
         vehiclePannedPosition = vehicle.position.clone();
         vehiclePannedPosition.z += 4;
+        }, undefined, function ( error ) {
+        console.error( error );
+    });
+    loader.load("{{ asset("models/moon.glb") }}", function ( gltf ) {
+        moon = gltf.scene;
+        scene.add(moon);
+        moon.position.set(-100, -50, -190);
         }, undefined, function ( error ) {
         console.error( error );
     });
@@ -382,7 +393,23 @@
         }
     });
 
+    /*************
+     *** STARS ***
+     *************/
+    let starCount = 100;
+    let starPositionArray = [];
+    let starArray = [];
+    for (let i = 0; i < starCount; i++) {
+        let starGeometry = new THREE.SphereGeometry(0.1, 5, 5);
+        let starMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+        let starMesh = new THREE.Mesh(starGeometry, starMaterial);
+        scene.add(starMesh);
+        starArray.push(starMesh);
+        starPositionArray[i] = new THREE.Vector3(getRandomArbitrary(-50, 50), getRandomArbitrary(-50, 50), getRandomArbitrary(-50, 50));
+    }
+
     function animate() {
+        (moon && earth && !moon.parent.name) ? earth.add(moon) : null;
         (educationPlane && earth && !educationPlane.parent.name) ? earth.add(educationPlane) : null;
         (education && educationPlane && !education.parent.name) ? educationPlane.add(education) : null;
         (experiencePlane && earth && !experiencePlane.parent.name) ? earth.add(experiencePlane) : null;
@@ -396,8 +423,15 @@
             updateRotation(earth, presetRotation);
             camera.position.lerp(cameraPannedPosition, movementSmoothness);
             vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
-
         }
+
+        starArray.forEach((star, index) => {
+            if(star && earth && !star.parent.name){
+                earth.add(star);
+            }
+            star.position.lerp(starPositionArray[index], movementSmoothness / 4);
+        });
+
         requestAnimationFrame( animate );
 
         if(isHeld && heldMouse && (heldMouse.x != 0 && heldMouse.y != 0) && !isViewing){
