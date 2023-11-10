@@ -20,7 +20,11 @@
         "imports": {
         "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
         "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/",
-        "three/addons/loaders/GLTFLoader.js": "https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js"
+        "three/addons/loaders/GLTFLoader.js": "https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js",
+        "three/addons/postprocessing/EffectComposer.js": "https://unpkg.com/three@0.158.0/examples/jsm/postprocessing/EffectComposer.js",
+        "three/addons/postprocessing/RenderPass.js": "https://unpkg.com/three@0.158.0/examples/jsm/postprocessing/RenderPass.js",
+        "three/addons/postprocessing/OutputPass.js": "https://unpkg.com/three@0.158.0/examples/jsm/postprocessing/OutputPass.js",
+        "three/addons/postprocessing/UnrealBloomPass.js": "https://unpkg.com/three@0.158.0/examples/jsm/postprocessing/UnrealBloomPass.js"
         }
     }
 </script>
@@ -30,6 +34,10 @@
      ***********************/
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
     /*******************
      *** SETUP SCENE ***
@@ -38,9 +46,17 @@
     const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
     const loader = new GLTFLoader();
     const renderer = new THREE.WebGLRenderer();
+    const composer = new EffectComposer( renderer );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    composer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
     camera.position.z = 3.5;
+    const renderPass = new RenderPass( scene, camera );
+    composer.addPass( renderPass );
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 1, 0.6);
+    composer.addPass(bloomPass)
+    const outputPass = new OutputPass();
+    composer.addPass( outputPass );
 
     let isHeld = false;
     let linePoints = [];
@@ -265,12 +281,17 @@
     scene.add( pointLight );
     const pointLight2 = new THREE.PointLight( 0x00CFFF, 13, 200 );
     pointLight2.position.set( -3, 0, 0 );
-    scene.add(pointLight2);
+    // scene.add(pointLight2);
+    const spotLight = new THREE.SpotLight(0xffffff, 500);
+    spotLight.position.set(30, 30, 30);
+    scene.add(spotLight);
     const sphereSize = 1;
     const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
     // scene.add( pointLightHelper );
     const pointLightHelper2 = new THREE.PointLightHelper( pointLight2, sphereSize );
     // scene.add( pointLightHelper2 );
+    const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+    // scene.add(spotLightHelper);
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);
 
@@ -410,6 +431,11 @@
 
     function animate() {
         (moon && earth && !moon.parent.name) ? earth.add(moon) : null;
+        if(spotLight && moon && !spotLight.target.name){
+            spotLight.target = moon;
+            scene.add( spotLight.target );
+            moon.add(spotLight);
+        }
         (educationPlane && earth && !educationPlane.parent.name) ? earth.add(educationPlane) : null;
         (education && educationPlane && !education.parent.name) ? educationPlane.add(education) : null;
         (experiencePlane && earth && !experiencePlane.parent.name) ? earth.add(experiencePlane) : null;
@@ -439,7 +465,7 @@
             earth.rotateOnWorldAxis(yAxis, degToRad(-heldMouse.x * rotateSpeed));
         }
 
-        renderer.render( scene, camera );
+        composer.render();
     }
 
     animate();
