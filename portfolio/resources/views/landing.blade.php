@@ -447,9 +447,19 @@
 
         if(isRotating){
             updateRotation(earth, presetRotation);
+            if(camera.position.distanceTo(cameraPannedPosition) < 0.04){
+                rotationStartTime -= 2000;
+                camera.position.set(cameraPannedPosition.x, cameraPannedPosition.y, cameraPannedPosition.z);
+            }
+            if(vehicle.position.distanceTo(vehiclePannedPosition) < 0.04){
+                rotationStartTime -= 2000;
+                vehicle.position.set(vehiclePannedPosition.x, vehiclePannedPosition.y, vehiclePannedPosition.z);
+            }
             camera.position.lerp(cameraPannedPosition, movementSmoothness);
             vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
         }
+
+        // console.log(isRotating, isViewing);
 
         starArray.forEach((star, index) => {
             if(star && earth && !star.parent.name){
