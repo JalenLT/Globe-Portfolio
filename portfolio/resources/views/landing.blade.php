@@ -53,7 +53,7 @@
     camera.position.z = 3.5;
     const renderPass = new RenderPass( scene, camera );
     composer.addPass( renderPass );
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 1, 0.6);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 1, 0.6);
     composer.addPass(bloomPass)
     const outputPass = new OutputPass();
     composer.addPass( outputPass );
@@ -148,6 +148,10 @@
     var projectsPlane = undefined;
     var vehicle = undefined;
     var moon = undefined;
+    var laptop = undefined;
+    var books = undefined;
+    var briefcase = undefined;
+    var camera = undefined;
     loader.load("{{ asset("models/earth.glb") }}", function ( gltf ) {
         earth = gltf.scene;
         scene.add(earth);
@@ -269,6 +273,30 @@
         moon = gltf.scene;
         scene.add(moon);
         moon.position.set(-100, -50, -190);
+        }, undefined, function ( error ) {
+        console.error( error );
+    });
+    loader.load("{{ asset("models/books.glb") }}", function ( gltf ) {
+        books = gltf.scene;
+        scene.add(books);
+        }, undefined, function ( error ) {
+        console.error( error );
+    });
+    loader.load("{{ asset("models/briefcase.glb") }}", function ( gltf ) {
+        briefcase = gltf.scene;
+        scene.add(briefcase);
+        }, undefined, function ( error ) {
+        console.error( error );
+    });
+    loader.load("{{ asset("models/camera.glb") }}", function ( gltf ) {
+        camera = gltf.scene;
+        scene.add(camera);
+        }, undefined, function ( error ) {
+        console.error( error );
+    });
+    loader.load("{{ asset("models/laptop.glb") }}", function ( gltf ) {
+        laptop = gltf.scene;
+        scene.add(laptop);
         }, undefined, function ( error ) {
         console.error( error );
     });
@@ -436,6 +464,10 @@
             scene.add( spotLight.target );
             moon.add(spotLight);
         }
+        (books && earth && !books.parent.name) ? earth.add(books) : null;
+        (briefcase && earth && !briefcase.parent.name) ? earth.add(briefcase) : null;
+        (camera && earth && !camera.parent.name) ? earth.add(camera) : null;
+        (laptop && earth && !laptop.parent.name) ? earth.add(laptop) : null;
         (educationPlane && earth && !educationPlane.parent.name) ? earth.add(educationPlane) : null;
         (education && educationPlane && !education.parent.name) ? educationPlane.add(education) : null;
         (experiencePlane && earth && !experiencePlane.parent.name) ? earth.add(experiencePlane) : null;
@@ -458,8 +490,6 @@
             camera.position.lerp(cameraPannedPosition, movementSmoothness);
             vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
         }
-
-        // console.log(isRotating, isViewing);
 
         starArray.forEach((star, index) => {
             if(star && earth && !star.parent.name){
