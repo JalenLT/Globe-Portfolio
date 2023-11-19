@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('landing');
 });
+Route::get('/anime', function () {
+    return view('anime_test');
+});
