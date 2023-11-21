@@ -28,30 +28,19 @@
 <body>
     <div id="timeline-container" class="position-absolute w-100 h-100 overflow-auto py-5"></div>
 
-    {{-- <div class="position-absolute">
-        <div name="timeline_item" class="container-fluid">
-            <div class="row mx-5 my-2 bg-light bg-opacity-10 border border-top-0 border-end-0 border-bottom-0 border-4 border-light rounded-3 fade-in">
-                <div class="col-lg-1 d-flex justify-content-center align-items-center">
-                    <i class="fa-solid fa-circle fade-in text-light"></i>
-                </div>
-                <div class="col-lg-11 overflow-hidden">
-                    <span name="timeline_title" class="fs-2 ps-2 fw-bolder d-block fade-in text-light">_title</span>
-                </div>
-                <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
-                    <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
-                </div>
-                <div class="col-lg-11">
-                    <span name="timeline_subtitle" class="fs-4 ps-2 fw-bolder d-block fade-in text-light">_subtitle</span>
-                </div>
-                <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
-                    <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
-                </div>
-                <div class="col-lg-11">
-                    <span name="timeline_description" class="fs-4 ps-2 fw-bolder d-block fade-in text-light">_description</span>
-                </div>
-            </div>
+    <div class="position-absolute bottom-0 start-0">
+        <div class="d-flex">
+            <a href="mailto:seunarine.stefan.lt@gmail.com"" class="btn btn-outline-light mx-2 mb-3"><i class="fa-solid fa-envelope"></i></a>
+            <a href="https://www.linkedin.com/in/stefan-seunarine-199618201/" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://github.com/JalenLT" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-square-github"></i></a>
         </div>
-    </div> --}}
+    </div>
+
+    <div class="position-absolute bottom-0 end-0">
+        <div class="d-flex">
+            <span class="mx-2 mb-2 fs-3 text-light"><script>document.write(new Date().getFullYear())</script> ©</span><span class="mx-2 fs-3 fw-bold text-light"> Stefan Seunarine</span>
+        </div>
+    </div>
     <script type="text/javascript">
         function degToRad(degrees){
             return degrees * (Math.PI / 180)
@@ -111,12 +100,13 @@
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
     @vite('resources/js/main.js')
     <script type="module" src="{{ Vite::asset('resources/js/anime_test.js') }}"></script>
-    <script type="module">
+    <script type="module" data-profile-image="{{ asset("images/tree.png") }}">
         /****************************
          *** INITIALIZE VARIABLES ***
         *****************************/
         var triggerFadeIn = new CustomEvent('trigger-fade-in');
         var triggerFadeOut = new CustomEvent('trigger-fade-out');
+
         const educationData = [
             {
                 title: "University of Bedfordshire",
@@ -170,7 +160,7 @@
         ];
         const aboutMeData = [
             {
-                title: "STEFAN SEUNARINE",
+                title: "<div class='d-flex align-items-center'><img src='{{ asset(env("PROFILE_PICTURE_PATH", "images/tree.png")) }}' class='me-2 rounded-3 border border-3' style='height: 4rem; width: 4rem;' alt='...'>STEFAN SEUNARINE</div>",
                 subtitle: "",
                 description: `
                     <span class='fw-bolder'>Introduction / Background</span><br><span class='fw-light'>Experienced programmer with a strong foundation in diverse programming languages and frameworks, including PHP, Laravel, JavaScript, Java, C#, and HTML. Proficient in leveraging analytical skills to develop efficient solutions. Committed to staying updated with industry advancements and eager to contribute technical expertise to innovative programming solutions. Enamored with the creation of visually stunning applications which both intuitive and stick in the mind of the user.</span>
