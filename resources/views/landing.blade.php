@@ -37,8 +37,9 @@
     </div>
 
     <div class="position-absolute bottom-0 end-0">
-        <div class="d-flex">
-            <span class="mx-2 mb-2 fs-3 text-light"><script>document.write(new Date().getFullYear())</script> ©</span><span class="mx-2 fs-3 fw-bold text-light"> Stefan Seunarine</span>
+        <div class="d-flex align-items-end">
+            <span class="fs-2 fw-light text-light">Stefan Seunarine</span>
+            <span class="mx-2 mb-1 fw-bold fs-5 text-light">© <script>document.write(new Date().getFullYear())</script></span>
         </div>
     </div>
     <script type="text/javascript">
