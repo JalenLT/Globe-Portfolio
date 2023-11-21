@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    <div id="timeline-container" class="position-absolute w-100"></div>
+    <div id="timeline-container" class="position-absolute w-100 h-100 overflow-auto py-5"></div>
 
     {{-- <div class="position-absolute">
         <div name="timeline_item" class="container-fluid">
@@ -72,19 +72,19 @@
                                             <i class="fa-solid fa-circle fade-in text-light"></i>
                                         </div>
                                         <div class="col-lg-11 overflow-hidden">
-                                            <span name="timeline_title" class="fs-2 ps-2 fw-bolder d-block fade-in text-light">` + title + `</span>
+                                            <span name="timeline_title" class="fs-3 ps-2 fw-bolder d-block fade-in" style='color: #e6ffff'>` + title + `</span>
                                         </div>
                                         <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
                                             <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
                                         </div>
                                         <div class="col-lg-11">
-                                            <span name="timeline_subtitle" class="fs-4 ps-2 fw-bolder d-block fade-in text-light">` + subtitle + `</span>
+                                            <span name="timeline_subtitle" class="fs-5 ps-2 d-block fade-in text-light fw-medium">` + subtitle + `</span>
                                         </div>
                                         <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
                                             <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
                                         </div>
                                         <div class="col-lg-11">
-                                            <span name="timeline_description" class="fs-4 ps-2 fw-bolder d-block fade-in text-light">` + description + `</span>
+                                            <span name="timeline_description" class="fs-5 ps-2 d-block fade-in text-light">` + description + `</span>
                                         </div>
                                     </div>
                                 </div>
@@ -115,17 +115,68 @@
         /****************************
          *** INITIALIZE VARIABLES ***
         *****************************/
-        var triggerFade = new CustomEvent('trigger-fade');
-        let educationData = [
+        var triggerFadeIn = new CustomEvent('trigger-fade-in');
+        var triggerFadeOut = new CustomEvent('trigger-fade-out');
+        const educationData = [
+            {
+                title: "University of Bedfordshire",
+                subtitle: "Bachelor of Science - BS, Information Technology",
+                description: "First Class Honours<br>Jan 2023 - Sep 2023"
+            },
             {
                 title: "The University of Trinidad and Tobago",
                 subtitle: "Diploma, Computer Software Engineering",
                 description: "2018 - 2020"
+            }
+        ];
+        const experienceData = [
+            {
+                title: "Information Technology Analyst / Programmer",
+                subtitle: "Ministry of the Attorney General Trinidad and Tobago",
+                description: `
+                    Dec 2022 - Present (11 months)
+                `
             },
             {
-                title: "University of Bedfordshire",
-                subtitle: "Bachelor of Science - BS, Information Technology",
-                description: "Jan 2023 - Sep 2023"
+                title: "Junior Programmer",
+                subtitle: "Ministry of the Attorney General Trinidad and Tobago",
+                description: `
+                    Jul 2021 - Nov 2022 (1 year 5 months)
+                `
+            }
+        ];
+        const projectData = [
+            {
+                title: "AGLA Careers: Innovative Vacancy Solution for the Office of the Attorney General and Ministry of Legal Affairs",
+                subtitle: "As a developer on this project, I played an important role in the creation of AGLA Careers, a cuttingedge solution designed to streamline the management of both internal and external job vacancies within the Office of the Attorney General and Ministry of Legal Affairs (AGLA).",
+                description: `
+                <span class='fw-bolder'>Key Accomplishments</span> <br>&emsp;<span class='fw-light'>1. User-Focused Front End: Crafted the user interface with HTML, JavaScript, and other essential technologies, ensuring a user-friendly and engaging experience for both job seekers and hiring personnel.<br>&emsp; 2. Enhanced Recruitment Process: Collaborated closely with the project team to improve the recruitment workflow, enabling AGLA to attract, assess, and select the most qualified candidates efficiently.<br>&emsp; 3. Scalability: Designed the platform with scalability in mind, making it adaptable to the evolving needs of the Ministry as it continues to grow. This modularity allows for seamless updates and enhancements.<br>&emsp; 4. Innovation and Relevance: Ensured that "AGLA Careers" remains relevant and innovative, capable of meeting future challenges in the realm of talent acquisition and human resources.</span><br><br><span class='fw-bolder'>Technical Skills Utilized</span><br>&emsp; <span class='fw-light'>1. Front-End Development: Proficiently employed HTML, JavaScript, and other front-end technologies to create an intuitive and dynamic user interface.<br>&emsp; 2. User Experience (UX) Design: Prioritized the user experience, resulting in an interface that is both user-friendly and aesthetically pleasing.<br>&emsp; 3. Scalable Design: Employed best practices for building modular, scalable web applications, allowing for ongoing updates and improvements.<br>&emsp; 4. Collaboration: Worked closely with cross-functional teams to align the front-end design with the project's broader objectives.</span>
+                `
+            },
+            {
+                title: "Electronic File Management System for the Office of the Attorney General and Ministry of Legal Affairs",
+                subtitle: "As the lead developer, I spearheaded the design and development of the Electronic File Management System, a transformative solution for the Office of the Attorney General and Ministry of Legal Affairs. In a ministry where all information was traditionally recorded on physical files, this web application was created to address several critical challenges: ",
+                description: `
+                <span class='fw-bolder'>Key Accomplishments</span> <br>&emsp;<span class='fw-light'>1. Digital File Creation and Editing: The system enabled the creation, editing, and management of digital files, eliminating the need for physical paperwork. This transition significantly reduced the volume of paper files, saving time and storage space.<br>&emsp; 2. Digital Signatures: Implemented a secure digital signing feature, allowing authorized personnel to add their digital signatures to files. This ensured the authenticity and integrity of the documents.<br>&emsp; 3. User Access Control: Leveraging the Active Directory system, we ensured that only authorized members of the ministry had access to the application. This streamlined user management, eliminating the need for additional accounts and passwords.<br>&emsp; 4. Efficient Collaboration: With digital files accessible to multiple users simultaneously, the application streamlined collaboration and improved efficiency across various departments within the ministry.<br>&emsp; 5. PDF Conversion: To comply with policies requiring physical files, the system automatically converted digital files into PDF format, ready for printing and archiving by the HR registry. This hybrid approach bridged the gap between digital and physical documentation.<br>&emsp; 6. User Adoption: Successfully rolled out the system to the HR department and a select group of users, with plans for expanding the user base across the entire ministry.</span> <br><br><span class='fw-bolder'>Technical Skills Utilized</span><br>&emsp; <span class='fw-light'>1. Web Application Development: Proficiently developed the application using PHP, Laravel, JavaScript, and HTML.<br>&emsp; 2. Database Management: Employed PostgreSQL for efficient data storage and retrieval.<br>&emsp; 3. Active Directory Integration: Expertly integrated the application with the ministry's Active Directory for seamless user access control.<br>&emsp; 4. PDF Generation: Utilized FPDF and FPDI to convert digital files to PDF format.<br>&emsp; 5. Security and Authentication: Implemented robust security measures to protect sensitive data and ensure authorized access.</span>
+                `
+            },
+            {
+                title: "Custom Management System for Vacation and Afterschool Center",
+                subtitle: "As the lead programmer, I was responsible for the design and development of a bespoke Management System for the Vacation and Afterschool Center within the Office of the Attorney General and Ministry of Legal Affairs. This project aimed to streamline the registration process for parents and enhance the administrative capabilities for the Ministry's staff.",
+                description: `
+                <span class='fw-bolder'>Key Accomplishments</span> <br>&emsp; <span class='fw-light'>1. Parent Registration Portal: Designed and implemented a user-friendly web interface that allowed parents to easily register their children within the system. This portal simplified the enrollment process, making it convenient for parents.<br>&emsp; 2. Admin Control Panel: Developed a separate secure portal for administrative users, offering features such as child profile management. Admins could view, edit, and delete child profiles, ensuring efficient center operations.<br>&emsp; 3. Activity Logs: Implemented a robust activity logging system, enabling administrators to leave detailed records for each child. This feature enhanced accountability and communication within the center.<br>&emsp; 4. Customized User Roles: Created distinct user roles and permissions, ensuring that only authorized personnel could access sensitive information and functionality.<br>&emsp; 5. Data Security: Prioritized data security by implementing encryption, access controls, and regular backups to protect sensitive information and ensure compliance with privacy regulations.</span>
+                `
+            }
+        ];
+        const aboutMeData = [
+            {
+                title: "STEFAN SEUNARINE",
+                subtitle: "",
+                description: `
+                    <span class='fw-bolder'>Introduction / Background</span><br><span class='fw-light'>Experienced programmer with a strong foundation in diverse programming languages and frameworks, including PHP, Laravel, JavaScript, Java, C#, and HTML. Proficient in leveraging analytical skills to develop efficient solutions. Committed to staying updated with industry advancements and eager to contribute technical expertise to innovative programming solutions. Enamored with the creation of visually stunning applications which both intuitive and stick in the mind of the user.</span>
+                    <span class='fw-bolder'>Passions and Interests</span><br><span class='fw-light'><ul><li>Artificial Intelligence</li><li>UI/UX</li></ul></span>
+                    <span class='fw-bolder'>Skills</span><br><span class='fw-light'>Front-End Development   •   Scalable Design   •   Collaboration   •   Active Directory Integration   •   PDF  Generation   •   Security   •   Web Development   •   Backend Development   •   Database Management   •   User Experience (UX) Design </span>
+                `
             }
         ];
 
@@ -496,7 +547,7 @@
 
                     educationData.forEach(element => {
                         document.querySelector("#timeline-container").innerHTML += buildUIItem(element.title, element.subtitle, element.description);
-                        document.dispatchEvent(triggerFade);
+                        document.dispatchEvent(triggerFadeIn);
                     });
                 }
             }
@@ -508,6 +559,11 @@
                     rotationStartTime = Date.now();
                     presetRotation = experienceRotation;
                     experiencePlane.scale.set(1, 1, 1);
+
+                    experienceData.forEach(element => {
+                        document.querySelector("#timeline-container").innerHTML += buildUIItem(element.title, element.subtitle, element.description);
+                        document.dispatchEvent(triggerFadeIn);
+                    });
                 }
             }
             if(aboutMePlane){
@@ -518,6 +574,11 @@
                     rotationStartTime = Date.now();
                     presetRotation = aboutMeRotation;
                     aboutMePlane.scale.set(1, 1, 1);
+
+                    aboutMeData.forEach(element => {
+                        document.querySelector("#timeline-container").innerHTML += buildUIItem(element.title, element.subtitle, element.description);
+                        document.dispatchEvent(triggerFadeIn);
+                    });
                 }
             }
             if(projectsPlane){
@@ -528,6 +589,11 @@
                     rotationStartTime = Date.now();
                     presetRotation = projectsRotation;
                     projectsPlane.scale.set(1, 1, 1);
+
+                    projectData.forEach(element => {
+                        document.querySelector("#timeline-container").innerHTML += buildUIItem(element.title, element.subtitle, element.description);
+                        document.dispatchEvent(triggerFadeIn);
+                    });
                 }
             }
             if(isClicked){
@@ -544,6 +610,8 @@
                 rotationStartTime = Date.now();
                 cameraPannedPosition = new THREE.Vector3(0, 0, 3.5);
                 vehiclePannedPosition = new THREE.Vector3(0, 0, 1.3);
+
+                document.dispatchEvent(triggerFadeOut);
             }
         });
 
