@@ -31,8 +31,8 @@
     <div class="position-absolute bottom-0 start-0">
         <div class="d-flex">
             <a href="mailto:seunarine.stefan.lt@gmail.com"" class="btn btn-outline-light mx-2 mb-3"><i class="fa-solid fa-envelope"></i></a>
-            <a href="https://www.linkedin.com/in/stefan-seunarine-199618201/" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://github.com/JalenLT" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-square-github"></i></a>
+            <a target="_blank" href="https://www.linkedin.com/in/stefan-seunarine-199618201/" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-linkedin"></i></a>
+            <a target="_blank" href="https://github.com/JalenLT" class="btn btn-outline-light mx-2 mb-3"><i class="fa-brands fa-square-github"></i></a>
         </div>
     </div>
 
