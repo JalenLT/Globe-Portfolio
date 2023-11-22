@@ -27,7 +27,9 @@
 </head>
 <body>
     <div id="timeline-container" class="position-absolute w-100 h-100 overflow-auto py-5"></div>
-
+    <div id="loading-screen" class="fade-out position-absolute top-50 start-50 translate-middle w-100 h-100" style="background-color: #180031;">
+        <img src="{{ asset("images/loading_animation.gif") }}" alt="..." class="img-fluid position-absolute top-50 start-50 translate-middle rounded-pill">
+    </div>
     <div class="position-absolute bottom-0 start-0">
         <div class="d-flex">
             <a href="mailto:seunarine.stefan.lt@gmail.com"" class="btn btn-outline-light mx-2 mb-3"><i class="fa-solid fa-envelope"></i></a>
@@ -57,24 +59,24 @@
                         <div class="col-6">
                             <div class="">
                                 <div name="timeline_item" class="container-fluid">
-                                    <div class="row mx-5 my-2 rounded-3 fade-in">
+                                    <div class="row mx-5 my-2 rounded-3 fade-in fade-out">
                                         <div class="col-lg-1 d-flex justify-content-center align-items-center">
-                                            <i class="fa-solid fa-circle fade-in text-light"></i>
+                                            <i class="fa-solid fa-circle fade-in fade-out text-light"></i>
                                         </div>
                                         <div class="col-lg-11 overflow-hidden">
-                                            <span name="timeline_title" class="fs-3 ps-2 fw-bolder d-block fade-in" style='color: #e6ffff'>` + title + `</span>
+                                            <span name="timeline_title" class="fs-3 ps-2 fw-bolder d-block fade-in fade-out" style='color: #e6ffff'>` + title + `</span>
                                         </div>
                                         <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
                                             <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
                                         </div>
                                         <div class="col-lg-11">
-                                            <span name="timeline_subtitle" class="fs-5 ps-2 d-block fade-in text-light fw-medium">` + subtitle + `</span>
+                                            <span name="timeline_subtitle" class="fs-5 ps-2 d-block fade-in fade-out text-light fw-medium">` + subtitle + `</span>
                                         </div>
                                         <div class="col-lg-1 d-flex justify-content-center align-items-center overflow-hidden">
                                             <div class="vr text-light" style="width: 5px !important; opacity: 1;"></div>
                                         </div>
                                         <div class="col-lg-11">
-                                            <span name="timeline_description" class="fs-5 ps-2 d-block fade-in text-light">` + description + `</span>
+                                            <span name="timeline_description" class="fs-5 ps-2 d-block fade-in fade-out text-light">` + description + `</span>
                                         </div>
                                     </div>
                                 </div>
@@ -186,7 +188,8 @@
         *******************/
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        const loader = new GLTFLoader();
+        const manager = new THREE.LoadingManager();
+        const loader = new GLTFLoader(manager);
         const renderer = new THREE.WebGLRenderer();
         const composer = new EffectComposer( renderer );
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -199,6 +202,12 @@
         composer.addPass(bloomPass)
         const outputPass = new OutputPass();
         composer.addPass( outputPass );
+        let loaded = false;
+
+        manager.onLoad = function ( ) {
+            document.dispatchEvent(triggerFadeOut);
+            loaded = true;
+        };
 
         let isHeld = false;
         let linePoints = [];
@@ -529,7 +538,7 @@
             // Calculate the intersection point with the z = 0 plane
             if(educationPlane){
                 let educationIntersection = raycaster.intersectObject(educationPlane);
-                if (educationIntersection.length > 0) {
+                if (educationIntersection.length > 0 && !isViewing) {
                     isClicked = true;
                     isRotating = true;
                     rotationStartTime = Date.now();
@@ -544,7 +553,7 @@
             }
             if(experiencePlane){
                 let experienceIntersection = raycaster.intersectObject(experiencePlane);
-                if (experienceIntersection.length > 0) {
+                if (experienceIntersection.length > 0 && !isViewing) {
                     isClicked = true;
                     isRotating = true;
                     rotationStartTime = Date.now();
@@ -559,7 +568,7 @@
             }
             if(aboutMePlane){
                 let aboutMeIntersection = raycaster.intersectObject(aboutMePlane);
-                if (aboutMeIntersection.length > 0) {
+                if (aboutMeIntersection.length > 0 && !isViewing) {
                     isClicked = true;
                     isRotating = true;
                     rotationStartTime = Date.now();
@@ -574,7 +583,7 @@
             }
             if(projectsPlane){
                 let projectsIntersection = raycaster.intersectObject(projectsPlane);
-                if (projectsIntersection.length > 0) {
+                if (projectsIntersection.length > 0 && !isViewing) {
                     isClicked = true;
                     isRotating = true;
                     rotationStartTime = Date.now();
@@ -622,54 +631,56 @@
         }
 
         function animate() {
-            (moon && earth && !moon.parent.name) ? earth.add(moon) : null;
-            if(spotLight && moon && !spotLight.target.name){
-                spotLight.target = moon;
-                scene.add( spotLight.target );
-                moon.add(spotLight);
+            if(loaded){
+                (moon && earth && !moon.parent.name) ? earth.add(moon) : null;
+                if(spotLight && moon && !spotLight.target.name){
+                    spotLight.target = moon;
+                    scene.add( spotLight.target );
+                    moon.add(spotLight);
+                }
+                (books && earth && !books.parent.name) ? earth.add(books) : null;
+                (briefcase && earth && !briefcase.parent.name) ? earth.add(briefcase) : null;
+                (cameraCam && earth && !cameraCam.parent.name) ? earth.add(cameraCam) : null;
+                (laptop && earth && !laptop.parent.name) ? earth.add(laptop) : null;
+                (educationPlane && earth && !educationPlane.parent.name) ? earth.add(educationPlane) : null;
+                (education && educationPlane && !education.parent.name) ? educationPlane.add(education) : null;
+                (experiencePlane && earth && !experiencePlane.parent.name) ? earth.add(experiencePlane) : null;
+                (experience && experiencePlane && !experience.parent.name) ? experiencePlane.add(experience) : null;
+                (aboutMePlane && earth && !aboutMePlane.parent.name) ? earth.add(aboutMePlane) : null;
+                (aboutMe && aboutMePlane && !aboutMe.parent.name) ? aboutMePlane.add(aboutMe) : null;
+                (projectsPlane && earth && !projectsPlane.parent.name) ? earth.add(projectsPlane) : null;
+                (projects && projectsPlane && !projects.parent.name) ? projectsPlane.add(projects) : null;
+
+                if(isRotating){
+                    updateRotation(earth, presetRotation);
+                    if(camera.position.distanceTo(cameraPannedPosition) < 0.04){
+                        rotationStartTime -= 2000;
+                        camera.position.set(cameraPannedPosition.x, cameraPannedPosition.y, cameraPannedPosition.z);
+                    }
+                    if(vehicle.position.distanceTo(vehiclePannedPosition) < 0.04){
+                        rotationStartTime -= 2000;
+                        vehicle.position.set(vehiclePannedPosition.x, vehiclePannedPosition.y, vehiclePannedPosition.z);
+                    }
+                    camera.position.lerp(cameraPannedPosition, movementSmoothness);
+                    vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
+                }
+
+                starArray.forEach((star, index) => {
+                    if(star && earth && !star.parent.name){
+                        earth.add(star);
+                    }
+                    star.position.lerp(starPositionArray[index], movementSmoothness / 4);
+                });
+
+
+                if(isHeld && heldMouse && (heldMouse.x != 0 && heldMouse.y != 0) && !isViewing){
+                    earth.rotateOnWorldAxis(xAxis, degToRad(heldMouse.y * rotateSpeed));
+                    earth.rotateOnWorldAxis(yAxis, degToRad(-heldMouse.x * rotateSpeed));
+                }
+
+                composer.render();
             }
-            (books && earth && !books.parent.name) ? earth.add(books) : null;
-            (briefcase && earth && !briefcase.parent.name) ? earth.add(briefcase) : null;
-            (cameraCam && earth && !cameraCam.parent.name) ? earth.add(cameraCam) : null;
-            (laptop && earth && !laptop.parent.name) ? earth.add(laptop) : null;
-            (educationPlane && earth && !educationPlane.parent.name) ? earth.add(educationPlane) : null;
-            (education && educationPlane && !education.parent.name) ? educationPlane.add(education) : null;
-            (experiencePlane && earth && !experiencePlane.parent.name) ? earth.add(experiencePlane) : null;
-            (experience && experiencePlane && !experience.parent.name) ? experiencePlane.add(experience) : null;
-            (aboutMePlane && earth && !aboutMePlane.parent.name) ? earth.add(aboutMePlane) : null;
-            (aboutMe && aboutMePlane && !aboutMe.parent.name) ? aboutMePlane.add(aboutMe) : null;
-            (projectsPlane && earth && !projectsPlane.parent.name) ? earth.add(projectsPlane) : null;
-            (projects && projectsPlane && !projects.parent.name) ? projectsPlane.add(projects) : null;
-
-            if(isRotating){
-                updateRotation(earth, presetRotation);
-                if(camera.position.distanceTo(cameraPannedPosition) < 0.04){
-                    rotationStartTime -= 2000;
-                    camera.position.set(cameraPannedPosition.x, cameraPannedPosition.y, cameraPannedPosition.z);
-                }
-                if(vehicle.position.distanceTo(vehiclePannedPosition) < 0.04){
-                    rotationStartTime -= 2000;
-                    vehicle.position.set(vehiclePannedPosition.x, vehiclePannedPosition.y, vehiclePannedPosition.z);
-                }
-                camera.position.lerp(cameraPannedPosition, movementSmoothness);
-                vehicle.position.lerp(vehiclePannedPosition, movementSmoothness);
-            }
-
-            starArray.forEach((star, index) => {
-                if(star && earth && !star.parent.name){
-                    earth.add(star);
-                }
-                star.position.lerp(starPositionArray[index], movementSmoothness / 4);
-            });
-
             requestAnimationFrame( animate );
-
-            if(isHeld && heldMouse && (heldMouse.x != 0 && heldMouse.y != 0) && !isViewing){
-                earth.rotateOnWorldAxis(xAxis, degToRad(heldMouse.y * rotateSpeed));
-                earth.rotateOnWorldAxis(yAxis, degToRad(-heldMouse.x * rotateSpeed));
-            }
-
-            composer.render();
         }
 
         animate();
